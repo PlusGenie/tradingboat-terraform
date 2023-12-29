@@ -159,8 +159,8 @@ data "template_file" "user_data" {
 # Launch an EC2 instance
 resource "aws_instance" "tbot_instance" {
   ami             = var.ami_id
-  aws_instance_type   = var.aws_instance_type 
-  aws_ssh_key_name        = var.aws_ssh_key_name
+  instance_type   = var.aws_instance_type 
+  key_name        = var.aws_ssh_key_name
   security_groups = [aws_security_group.tbot_terraform_security_group.name]
 
   # User data script to configure the instance (e.g., install Docker, create user, setup variables)
