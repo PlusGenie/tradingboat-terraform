@@ -1,5 +1,5 @@
 # Variable definitions
-variable "region" {
+variable "aws_region" {
   description = "AWS region to deploy the resources"
   type        = string
   default     = "eu-west-2"
@@ -17,13 +17,13 @@ variable "ami_id" {
   default     = "ami-0e5f882be1900e43b"
 }
 
-variable "instance_type" {
+variable "aws_instance_type" {
   description = "AWS EC2 instances"
   type        = string
-  default     = "t2.small"
+  default     = "t2.medium"
 }
 
-variable "key_name" {
+variable "aws_ssh_key_name" {
   description = "The name of the SSH key pair to attach to the EC2 instances"
   type        = string
   default     = "Terraform_TBOT"
@@ -54,7 +54,7 @@ variable "TBOT_IBKR_IPADDR" {
 }
 
 # Variable for allowed IP addresses
-variable "ALLOWED_IPS" {
+variable "aws_ALLOWED_IPS" {
   description = "List of allowed IP addresses for security group ingress rules"
   type        = list(string)
   default     = ["0.0.0.0/0"]  # Default to allow all addresses
@@ -62,7 +62,7 @@ variable "ALLOWED_IPS" {
 
 # AWS Provider configuration
 provider "aws" {
-  region = var.region
+  region = var.aws_region
 }
 
 # Create a security group to allow SSH, VNC, TradingBoat web interface, and Ngrok Web Agent connections
@@ -83,7 +83,7 @@ resource "aws_security_group" "tbot_terraform_security_group" {
     from_port   = 5900
     to_port     = 5901
     protocol    = "tcp"
-    cidr_blocks = var.ALLOWED_IPS
+    cidr_blocks = var.aws_ALLOWED_IPS
     description = "VNC Port"
   }
 
@@ -91,7 +91,7 @@ resource "aws_security_group" "tbot_terraform_security_group" {
     from_port   = 6379
     to_port     = 6379
     protocol    = "tcp"
-    cidr_blocks = var.ALLOWED_IPS
+    cidr_blocks = var.aws_ALLOWED_IPS
     description = "Redis"
   }
 
@@ -116,7 +116,7 @@ resource "aws_security_group" "tbot_terraform_security_group" {
     from_port   = 5000
     to_port     = 5000
     protocol    = "tcp"
-    cidr_blocks = var.ALLOWED_IPS  # Use the ALLOWED_IPS variable
+    cidr_blocks = var.aws_ALLOWED_IPS  # Use the aws_ALLOWED_IPS variable
     description = "TradingBoat web interface"
   }
 
@@ -124,7 +124,7 @@ resource "aws_security_group" "tbot_terraform_security_group" {
     from_port   = 4040
     to_port     = 4040
     protocol    = "tcp"
-    cidr_blocks = var.ALLOWED_IPS  # Use the ALLOWED_IPS variable
+    cidr_blocks = var.aws_ALLOWED_IPS  # Use the aws_ALLOWED_IPS variable
     description = "Ngrok Web Agent"
   }
 
@@ -133,7 +133,7 @@ resource "aws_security_group" "tbot_terraform_security_group" {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"  # All protocols
-    cidr_blocks = ["0.0.0.0/0"]  # Use the ALLOWED_IPS variable
+    cidr_blocks = ["0.0.0.0/0"]  # Use the aws_ALLOWED_IPS variable
     description = "Allow all outbound traffic"
   }
 }
@@ -159,8 +159,8 @@ data "template_file" "user_data" {
 # Launch an EC2 instance
 resource "aws_instance" "tbot_instance" {
   ami             = var.ami_id
-  instance_type   = var.instance_type 
-  key_name        = var.key_name
+  aws_instance_type   = var.aws_instance_type 
+  aws_ssh_key_name        = var.aws_ssh_key_name
   security_groups = [aws_security_group.tbot_terraform_security_group.name]
 
   # User data script to configure the instance (e.g., install Docker, create user, setup variables)
