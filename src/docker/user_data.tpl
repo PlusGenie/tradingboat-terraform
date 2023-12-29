@@ -87,13 +87,11 @@ echo "export PS1=\"\\u@\\h ($EIP_ADDRESS) \\W\\\\$ \"" | tee -a /home/ubuntu/.ba
 
 log "PS1 prompt changed to include the public IP address."
 
-# Set the TBOT_DOCKER_BRANCH variable to 'master' by default
-TBOT_DOCKER_BRANCH="${TBOT_DOCKER_BRANCH:-master}"
-
 # Clone the required repositories
 log "Cloning required repositories..."
+log "TBOT_DOCKER_BRANCH is set to: $TBOT_DOCKER_BRANCH"
 if ! mkdir -p /home/ubuntu/develop/github || \
-   ! git clone -b "$TBOT_DOCKER_BRANCH" https://github.com/PlusGenie/ib-gateway-docker /home/ubuntu/develop/github/ib-gateway-docker; then
+   ! git clone -b "${TBOT_DOCKER_BRANCH}" https://github.com/PlusGenie/ib-gateway-docker /home/ubuntu/develop/github/ib-gateway-docker; then
     log "Failed to clone one or more repositories."
     exit 1
 fi
